@@ -1,0 +1,37 @@
+- name: Install necessary dependencies
+  apt:
+    name: docker.io, python3-pip, docker
+    state: present
+
+- name: Install docker-py Python module
+  pip:
+    name: docker-py
+    state: present
+
+- name: Clone the repo
+  git:
+    repo: "{{ git_repo }}"
+    dest: "{{ clone_path }}"
+
+- name: Copy Dockerfile to clone directory
+  copy:
+    src: "{{ dockerfile_path }}"
+    dest: "{{ clone_path }}/Dockerfile"
+
+- name: Login to ECR
+  shell: aws ecr get-login-password --region {{ aws_region }} | docker login --username AWS --password-stdin {{ aws_account_id }}.dkr.ecr.{{ aws_region }}.amazonaws.com
+
+- name: Docker service is started 
+  ansible.builtin.service:
+    name: docker
+    enabled: yes
+    state: started
+
+- name: Build the Docker image
+  shell: docker build -t {{ image_name }} {{ clone_path }}
+
+- name: Tag the Docker image
+  shell: docker tag {{ image_name }}:latest {{ aws_account_id }}.dkr.ecr.{{ aws_region }}.amazonaws.com/{{ image_name }}:latest
+
+- name: Push the Docker image to ECR
+  shell: docker push {{ aws_account_id }}.dkr.ecr.{{ aws_region }}.amazonaws.com/{{ image_name }}:latest

@@ -1,0 +1,6 @@
+- name: Build and Deploy App
+  hosts: localhost
+  gather_facts: false
+  roles:
+    - build
+    - deploy

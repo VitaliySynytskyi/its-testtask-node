@@ -1,0 +1,7 @@
+---
+git_repo: 'https://github.com/itsyndicate/its-testtask-node'
+clone_path: '/home/howery/itstask/its-testtask-node'
+dockerfile_path: '/home/howery/itstask/Dockerfile'
+aws_region: 'us-east-1'
+image_name: 'my-app-repo'
+aws_account_id: '301581196284'

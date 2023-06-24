@@ -1,0 +1,12 @@
+- name: Update kubeconfig
+  shell: aws eks update-kubeconfig --name {{ eks_name }} --region {{ aws_region }}
+
+- name: Apply Kubernetes manifests for app
+  community.kubernetes.k8s:
+    state: present
+    src: "{{ k8s_path }}/main.yaml"
+
+- name: Apply Kubernetes manifests for efs
+  community.kubernetes.k8s:
+    state: present
+    src: "{{ k8s_path }}/sc.yaml"

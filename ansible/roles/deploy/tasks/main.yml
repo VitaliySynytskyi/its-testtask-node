@@ -10,3 +10,6 @@
   community.kubernetes.k8s:
     state: present
     src: "{{ k8s_path }}/sc.yaml"
+
+- name: Run command for NewRelic from script file
+  script: /home/howery/itstask/command_script.sh

@@ -1,6 +1,18 @@
 - name: Update kubeconfig
   shell: aws eks update-kubeconfig --name {{ eks_name }} --region {{ aws_region }}
 
+- name: Execute terragrunt command
+  shell: "terragrunt output -json"
+  args:
+    chdir: "/home/howery/itstask/terragrunt"
+  register: terragrunt_output
+
+- name: Update sc.yaml with efs_id
+  replace:
+    path: "{{ k8s_path }}/sc.yaml"
+    regexp: 'fileSystemId: .*'
+    replace: 'fileSystemId: {{ terragrunt_output.stdout | from_json | json_query("efs_id.value") }}'
+
 - name: Apply Kubernetes manifests for app
   community.kubernetes.k8s:
     state: present
@@ -11,5 +23,6 @@
     state: present
     src: "{{ k8s_path }}/sc.yaml"
 
-- name: Run command for NewRelic from script file
-  script: /home/howery/itstask/command_script.sh
+- name: Run command from the script
+  shell: /bin/bash /home/howery/itstask/command_script.sh
+
